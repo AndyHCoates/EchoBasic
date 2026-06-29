@@ -104,8 +104,8 @@ namespace EchoBasic
                 }
                 else
                 {
-                    var first = operandStack.Pop();
-                    var second = operandStack.Pop();
+                    var first = (NumberToken)operandStack.Pop();
+                    var second = (NumberToken)operandStack.Pop();
                     var result = 0.0;
                     switch (t.Type)
                     {
@@ -125,11 +125,11 @@ namespace EchoBasic
                             throw new ArgumentException($"Unknown operator: {t.Type}");
                     }
 
-                    operandStack.Push(new Token(TokenType.Number, result));
+                    operandStack.Push(new NumberToken(result));
                 }
             }
 
-            return operandStack.Pop().Value;
+            return ((NumberToken)operandStack.Pop()).Value;
         }
 
         public double Calculate(string input)

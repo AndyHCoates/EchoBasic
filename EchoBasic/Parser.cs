@@ -30,37 +30,37 @@ namespace EchoBasic
                     }
 
                     var numberString = input.Substring(parseStart, parseLength);
-                    tokens.Add(new Token(TokenType.Number, double.Parse(numberString)));
+                    tokens.Add(new NumberToken(double.Parse(numberString)));
                     parseStart += parseLength;
                 }
                 else if (currentChar == '+')
                 {
-                    tokens.Add(new Token(TokenType.Plus, 0.0));
+                    tokens.Add(new Token(TokenType.Plus));
                     parseStart++;
                 }
                 else if (currentChar == '-')
                 {
-                    tokens.Add(new Token(TokenType.Minus, 0.0));
+                    tokens.Add(new Token(TokenType.Minus));
                     parseStart++;
                 }
                 else if (currentChar == '*')
                 {
-                    tokens.Add(new Token(TokenType.Multiply, 0.0));
+                    tokens.Add(new Token(TokenType.Multiply));
                     parseStart++;
                 }
                 else if (currentChar == '/')
                 {
-                    tokens.Add(new Token(TokenType.Divide, 0.0));
+                    tokens.Add(new Token(TokenType.Divide));
                     parseStart++;
                 }
                 else if (currentChar == '(')
                 {
-                    tokens.Add(new Token(TokenType.LeftParenthesis, 0.0));
+                    tokens.Add(new Token(TokenType.LeftParenthesis));
                     parseStart++;
                 }
                 else if (currentChar == ')')
                 {
-                    tokens.Add(new Token(TokenType.RightParenthesis, 0.0));
+                    tokens.Add(new Token(TokenType.RightParenthesis));
                     parseStart++;
                 }
                 else if (char.IsWhiteSpace(currentChar))

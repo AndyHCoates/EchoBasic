@@ -145,10 +145,10 @@
             var tokens = Parser.Tokenise(input);
             Assert.That(tokens.Count, Is.EqualTo(3));
             Assert.That(tokens[0].Type, Is.EqualTo(TokenType.Number));
-            Assert.That(tokens[0].Value, Is.EqualTo(3.14));
+            Assert.That(((NumberToken)tokens[0]).Value, Is.EqualTo(3.14));
             Assert.That(tokens[1].Type, Is.EqualTo(TokenType.Plus));
             Assert.That(tokens[2].Type, Is.EqualTo(TokenType.Number));
-            Assert.That(tokens[2].Value, Is.EqualTo(4));
+            Assert.That(((NumberToken)tokens[2]).Value, Is.EqualTo(4));
         }
 
         [Test]
@@ -159,14 +159,14 @@
             Assert.That(tokens.Count, Is.EqualTo(7));
             Assert.That(tokens[0].Type, Is.EqualTo(TokenType.LeftParenthesis));
             Assert.That(tokens[1].Type, Is.EqualTo(TokenType.Number));
-            Assert.That(tokens[1].Value, Is.EqualTo(3));
+            Assert.That(((NumberToken)tokens[1]).Value, Is.EqualTo(3));
             Assert.That(tokens[2].Type, Is.EqualTo(TokenType.Plus));
             Assert.That(tokens[3].Type, Is.EqualTo(TokenType.Number));
-            Assert.That(tokens[3].Value, Is.EqualTo(4));
+            Assert.That(((NumberToken)tokens[3]).Value, Is.EqualTo(4));
             Assert.That(tokens[4].Type, Is.EqualTo(TokenType.RightParenthesis));
             Assert.That(tokens[5].Type, Is.EqualTo(TokenType.Multiply));
             Assert.That(tokens[6].Type, Is.EqualTo(TokenType.Number));
-            Assert.That(tokens[6].Value, Is.EqualTo(2));
+            Assert.That(((NumberToken)tokens[6]).Value, Is.EqualTo(2));
         }
 
         [Test]
@@ -176,10 +176,10 @@
             var tokens = Parser.Tokenise(input);
             Assert.That(tokens.Count, Is.EqualTo(3));
             Assert.That(tokens[0].Type, Is.EqualTo(TokenType.Number));
-            Assert.That(tokens[0].Value, Is.EqualTo(-5));
+            Assert.That(((NumberToken)tokens[0]).Value, Is.EqualTo(-5));
             Assert.That(tokens[1].Type, Is.EqualTo(TokenType.Plus));
             Assert.That(tokens[2].Type, Is.EqualTo(TokenType.Number));
-            Assert.That(tokens[2].Value, Is.EqualTo(10));
+            Assert.That(((NumberToken)tokens[2]).Value, Is.EqualTo(10));
         }
 
         [Test]
@@ -189,14 +189,14 @@
             var tokens = Parser.Tokenise(input);
             Assert.That(tokens.Count, Is.EqualTo(7));
             Assert.That(tokens[0].Type, Is.EqualTo(TokenType.Number));
-            Assert.That(tokens[0].Value, Is.EqualTo(1));
+            Assert.That(((NumberToken)tokens[0]).Value, Is.EqualTo(1));
             Assert.That(tokens[1].Type, Is.EqualTo(TokenType.Plus));
             Assert.That(tokens[2].Type, Is.EqualTo(TokenType.LeftParenthesis));
             Assert.That(tokens[3].Type, Is.EqualTo(TokenType.Number));
-            Assert.That(tokens[3].Value, Is.EqualTo(-2));
+            Assert.That(((NumberToken)tokens[3]).Value, Is.EqualTo(-2));
             Assert.That(tokens[4].Type, Is.EqualTo(TokenType.Multiply));
             Assert.That(tokens[5].Type, Is.EqualTo(TokenType.Number));
-            Assert.That(tokens[5].Value, Is.EqualTo(3));
+            Assert.That(((NumberToken)tokens[5]).Value, Is.EqualTo(3));
             Assert.That(tokens[6].Type, Is.EqualTo(TokenType.RightParenthesis));
         }
 
@@ -207,10 +207,10 @@
             var tokens = Parser.Tokenise(input);
             Assert.That(tokens.Count, Is.EqualTo(3));
             Assert.That(tokens[0].Type, Is.EqualTo(TokenType.Number));
-            Assert.That(tokens[0].Value, Is.EqualTo(-1));
+            Assert.That(((NumberToken)tokens[0]).Value, Is.EqualTo(-1));
             Assert.That(tokens[1].Type, Is.EqualTo(TokenType.Minus));
             Assert.That(tokens[2].Type, Is.EqualTo(TokenType.Number));
-            Assert.That(tokens[2].Value, Is.EqualTo(1));
+            Assert.That(((NumberToken)tokens[2]).Value, Is.EqualTo(1));
         }
     }
 

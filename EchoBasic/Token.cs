@@ -13,18 +13,13 @@ namespace EchoBasic
         Multiply,
         Divide,
         LeftParenthesis,
-        RightParenthesis
+        RightParenthesis,
+        Keyword,
     }
 
     public class Token(TokenType type)
     {
         public TokenType Type { get; } = type;
-        public double Value { get; } = 0.0;
-
-        public Token(TokenType type, double value) : this(type)
-        {
-            Value = value;
-        }
 
         public int GetPrecedence()
         {
@@ -39,7 +34,27 @@ namespace EchoBasic
 
         public override string ToString()
         {
+            return $"{Type}";
+        }
+    }
+
+    public sealed class NumberToken(double value) : Token(TokenType.Number)
+    {
+        public double Value { get; } = value;
+
+        public override string ToString()
+        {
             return $"{Type}, {Value}";
+        }
+    }
+
+    public sealed class KeywordToken(string text) : Token(TokenType.Keyword)
+    {
+        public string Text { get; } = text;
+
+        public override string ToString()
+        {
+            return $"{Type}, {Text}";
         }
     }
 }
