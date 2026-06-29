@@ -1,4 +1,4 @@
-name: CI Pipeline - SimpleCalc
+name: CI Pipeline - EchoBasic
 
 on:
     push:
