@@ -4,7 +4,7 @@ using System.Text;
 
 namespace EchoBasic
 {
-    public class Calculator
+    public class Runtime
     {
         public double Add(double a, double b) => a + b;
         public double Subtract(double a, double b) => a - b;
@@ -21,7 +21,7 @@ namespace EchoBasic
 
         public Queue<Token> ShuntingYard(List<Token> tokens)
         {
-            var operatorStack = new Stack<Token>();
+            var operatorStack = new Stack<OperatorToken>();
             var outputQueue = new Queue<Token>();
             var parenCount = 0;
 
@@ -34,7 +34,7 @@ namespace EchoBasic
                         break;
 
                     case TokenType.LeftParenthesis:
-                        operatorStack.Push(t);
+                        operatorStack.Push((OperatorToken)t);
                         parenCount++;
                         break;
 
@@ -43,7 +43,7 @@ namespace EchoBasic
                         break;
 
                     default:
-                        PushOperator(operatorStack, outputQueue, t);
+                        PushOperator(operatorStack, outputQueue, (OperatorToken)t);
                         break;
                 }
             }
@@ -56,7 +56,7 @@ namespace EchoBasic
             return outputQueue;
         }
 
-        private static void PopUntilLeftParen(Stack<Token> operatorStack, Queue<Token> outputQueue, ref int parenCount)
+        private static void PopUntilLeftParen(Stack<OperatorToken> operatorStack, Queue<Token> outputQueue, ref int parenCount)
         {
             if (parenCount == 0)
             {
@@ -77,7 +77,7 @@ namespace EchoBasic
             parenCount--;
         }
 
-        private static void PushOperator(Stack<Token> operatorStack, Queue<Token> outputQueue, Token op)
+        private static void PushOperator(Stack<OperatorToken> operatorStack, Queue<Token> outputQueue, OperatorToken op)
         {
             if (operatorStack.Any() && operatorStack.Peek().Type != TokenType.LeftParenthesis && operatorStack.Peek().GetPrecedence() >= op.GetPrecedence())
             {
@@ -93,19 +93,19 @@ namespace EchoBasic
         /// <returns></returns>
         public double EvaluatePostFix(Queue<Token> postfixQueue)
         {
-            Stack<Token> operandStack = new();
+            Stack<NumberToken> operandStack = new();
 
             while (postfixQueue.Any())
             {
                 var t = postfixQueue.Dequeue();
                 if (t.Type == TokenType.Number)
                 {
-                    operandStack.Push(t);
+                    operandStack.Push((NumberToken)t);
                 }
                 else
                 {
-                    var first = (NumberToken)operandStack.Pop();
-                    var second = (NumberToken)operandStack.Pop();
+                    var first = operandStack.Pop();
+                    var second = operandStack.Pop();
                     var result = 0.0;
                     switch (t.Type)
                     {
@@ -129,7 +129,7 @@ namespace EchoBasic
                 }
             }
 
-            return ((NumberToken)operandStack.Pop()).Value;
+            return operandStack.Pop().Value;
         }
 
         public double Calculate(string input)

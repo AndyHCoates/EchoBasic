@@ -6,7 +6,7 @@ namespace EchoBasic
 {
     public static class Parser
     {
-        public static List<Token> Tokenise(string input)
+        public static List<Token> Tokenise(string input, bool immediate = false)
         {
             var tokens = new List<Token>();
 
@@ -30,37 +30,62 @@ namespace EchoBasic
                     }
 
                     var numberString = input.Substring(parseStart, parseLength);
+                    if (!tokens.Any())
+                    {
+                        tokens.Add(new LineNumberToken(Int32.Parse(numberString)));
+                        break;
+                    }
+
                     tokens.Add(new NumberToken(double.Parse(numberString)));
+                    parseStart += parseLength;
+                }
+                if (char.IsLetter(currentChar))
+                {
+                    var parseLength = 1;
+                    while (parseStart + parseLength < input.Length && (char.IsLetter(input[parseStart + parseLength])))
+                    {
+                        parseLength++;
+                    }
+
+                    var statementString = input.Substring(parseStart, parseLength);
+                    if (new KeywordToken(statementString).IsValid())
+                    {
+                        tokens.Add(new KeywordToken(statementString));
+                    }
+                    else
+                    {
+                        tokens.Add(new IdentifierToken(statementString));
+                    }
                     parseStart += parseLength;
                 }
                 else if (currentChar == '+')
                 {
-                    tokens.Add(new Token(TokenType.Plus));
+                    tokens.Add(new OperatorToken(TokenType.Plus));
                     parseStart++;
                 }
                 else if (currentChar == '-')
                 {
-                    tokens.Add(new Token(TokenType.Minus));
+                    tokens.Add(new OperatorToken(TokenType.Minus));
                     parseStart++;
                 }
                 else if (currentChar == '*')
                 {
-                    tokens.Add(new Token(TokenType.Multiply));
+                    tokens.Add(new OperatorToken(TokenType.Multiply));
                     parseStart++;
                 }
                 else if (currentChar == '/')
                 {
-                    tokens.Add(new Token(TokenType.Divide));
+                    tokens.Add(new OperatorToken(TokenType.Divide));
                     parseStart++;
                 }
                 else if (currentChar == '(')
                 {
-                    tokens.Add(new Token(TokenType.LeftParenthesis));
+                    tokens.Add(new OperatorToken(TokenType.LeftParenthesis));
                     parseStart++;
                 }
                 else if (currentChar == ')')
                 {
-                    tokens.Add(new Token(TokenType.RightParenthesis));
+                    tokens.Add(new OperatorToken(TokenType.RightParenthesis));
                     parseStart++;
                 }
                 else if (char.IsWhiteSpace(currentChar))

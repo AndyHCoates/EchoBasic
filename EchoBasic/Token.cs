@@ -14,23 +14,15 @@ namespace EchoBasic
         Divide,
         LeftParenthesis,
         RightParenthesis,
+        Assignment,
         Keyword,
+        Identifier,
+        LineNumber,
     }
 
     public class Token(TokenType type)
     {
         public TokenType Type { get; } = type;
-
-        public int GetPrecedence()
-        {
-            return Type switch
-            {
-                TokenType.LeftParenthesis => 100,
-                TokenType.Multiply or TokenType.Divide => 20,
-                TokenType.Plus or TokenType.Minus => 10,
-                _ => 0
-            };
-        }
 
         public override string ToString()
         {
@@ -50,11 +42,51 @@ namespace EchoBasic
 
     public sealed class KeywordToken(string text) : Token(TokenType.Keyword)
     {
+        private string[] _validKeywords = ["PRINT", "LET"];
+
         public string Text { get; } = text;
 
         public override string ToString()
         {
             return $"{Type}, {Text}";
+        }
+        
+        public bool IsValid()
+        {
+            return _validKeywords.Contains(Text.ToUpper());
+        }
+    }
+
+    public sealed class OperatorToken(TokenType type) : Token(type)
+    {
+        public int GetPrecedence()
+        {
+            return Type switch
+            {
+                TokenType.LeftParenthesis => 100,
+                TokenType.Multiply or TokenType.Divide => 20,
+                TokenType.Plus or TokenType.Minus => 10,
+                TokenType.Assignment => 1,
+                _ => 0
+            };
+        }
+    }
+    
+    public sealed class IdentifierToken(string name) : Token(TokenType.Identifier)
+    {
+        public string Name { get; } = name;
+        public override string ToString()
+        {
+            return $"{Type}, {Name}";
+        }
+    }
+    
+    public sealed class LineNumberToken(int lineNumber) : Token(TokenType.LineNumber)
+    {
+        public int LineNumber { get; } = lineNumber;
+        public override string ToString()
+        {
+            return $"{Type}, {LineNumber}";
         }
     }
 }
