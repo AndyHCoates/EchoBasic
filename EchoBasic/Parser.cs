@@ -58,6 +58,21 @@ namespace EchoBasic
                     }
                     parseStart += parseLength;
                 }
+                else if (currentChar == '"')
+                {
+                    var parseLength = 1;
+                    while (parseStart + parseLength < input.Length && input[parseStart + parseLength] != '"')
+                    {
+                        parseLength++;
+                    }
+                    if (parseStart + parseLength >= input.Length)
+                    {
+                        throw new Exception("Unterminated string literal");
+                    }
+                    var stringLiteral = input.Substring(parseStart + 1, parseLength - 1);
+                    tokens.Add(new StringLiteralToken(stringLiteral));
+                    parseStart += parseLength + 1; // Skip the closing quote
+                }
                 else if (currentChar == '+')
                 {
                     tokens.Add(new OperatorToken(TokenType.Plus));

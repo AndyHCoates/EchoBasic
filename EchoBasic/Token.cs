@@ -18,6 +18,7 @@ namespace EchoBasic
         Keyword,
         Identifier,
         LineNumber,
+        StringLiteral
     }
 
     public class Token(TokenType type)
@@ -87,6 +88,15 @@ namespace EchoBasic
         public override string ToString()
         {
             return $"{Type}, {LineNumber}";
+        }
+    }
+    
+    public sealed class StringLiteralToken(string value) : Token(TokenType.StringLiteral)
+    {
+        public string Value { get; } = value;
+        public override string ToString()
+        {
+            return $"{Type}, \"{Value}\"";
         }
     }
 }

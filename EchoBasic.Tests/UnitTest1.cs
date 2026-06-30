@@ -150,7 +150,11 @@ namespace EchoBasic.Tests
         {
             Assert.That(new KeywordToken("GOTO").IsValid(), Is.False);
         }
+    }
 
+    [TestFixture]
+    public class AssignmentTests
+    {
         [Test]
         public void ImpliedAssignmentTest()
         {
@@ -159,6 +163,102 @@ namespace EchoBasic.Tests
             Assert.That(Storage.GetNumeric("X"), Is.EqualTo(5));
         }
         
+        [Test]
+        public void ImpliedAssignmentWithExpression()
+        {
+            var tokens = Parser.Tokenise("X = 5 + 3", true);
+            Runtime.RunLine(tokens);
+            Assert.That(Storage.GetNumeric("X"), Is.EqualTo(8));
+        }
+
+        [Test]
+        public void LetAssignmentWithExpression()
+        {
+            var tokens = Parser.Tokenise("LET Y = 10 * 2", true);
+            Runtime.RunLine(tokens);
+            Assert.That(Storage.GetNumeric("Y"), Is.EqualTo(20));
+        }
+
+        [Test]
+        public void LetAssignmentWithParentheses()
+        {
+            var tokens = Parser.Tokenise("LET Z = (5 + 3) * 2", true);
+            Runtime.RunLine(tokens);
+            Assert.That(Storage.GetNumeric("Z"), Is.EqualTo(16));
+        }
+        
+        [Test]
+        public void LineNumberStorageWithInvalidLineNumberThrowsException()
+        {
+            var tokens = Parser.Tokenise("0 LET X = 5", true);
+            Assert.Throws<ArgumentOutOfRangeException>(() => Runtime.RunLine(tokens));
+        }
+
+        [Test]
+        public void LineNumberStorageWithEmptyTextThrowsException()
+        {
+            var tokens = Parser.Tokenise("10 ", true);
+            Assert.Throws<ArgumentException>(() => Runtime.RunLine(tokens));
+        }
+        
+    }
+
+    [TestFixture]
+    public class PrintTests
+    {
+        private StringWriter _output;
+        
+        [SetUp]
+        public void Setup()
+        {
+            _output = new StringWriter();
+            Console.SetOut(_output);
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            _output.Dispose();
+            Console.SetOut(Console.Out);
+        }
+
+        [Test]
+        public void PrintNumeric()
+        {
+            var tokens = Parser.Tokenise("print 10", true);
+            Runtime.RunLine(tokens);
+            var result = _output.ToString().Trim();
+            Assert.That(result, Is.EqualTo("10"));
+        }
+
+        [Test]
+        public void PrintEquation()
+        {
+            var tokens = Parser.Tokenise("print 12 * 4", true);
+            Runtime.RunLine(tokens);
+            var result = _output.ToString().Trim();
+            Assert.That(result, Is.EqualTo("48"));
+        }
+
+        [Test]
+        public void PrintVariable()
+        {
+            Storage.AddNumeric("x", 16.4);
+            var tokens = Parser.Tokenise("print x", true);
+            Runtime.RunLine(tokens);
+            var result = _output.ToString().Trim();
+            Assert.That(result, Is.EqualTo("16.4"));
+        }
+
+        [Test]
+        public void PrintExpressionWithVariable()
+        {
+            Storage.AddNumeric("x", 3);
+            var tokens = Parser.Tokenise("print 8 + x", true);
+            Runtime.RunLine(tokens);
+            var result = _output.ToString().Trim();
+            Assert.That(result, Is.EqualTo("11"));
+        }
     }
 
     [TestFixture]

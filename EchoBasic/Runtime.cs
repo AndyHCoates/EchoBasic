@@ -25,6 +25,44 @@ namespace EchoBasic
             {
                 ImpliedAssignment(opTokens.Skip(1).ToList(), ((IdentifierToken) firstToken).Name);
             }
+            else if (firstToken.Type == TokenType.Keyword)
+            {
+                var keywordToken = (KeywordToken)firstToken;
+                switch (keywordToken.Text.ToUpper())
+                {
+                    case "LET":
+                        if (opTokens[1].Type == TokenType.Identifier)
+                        {
+                            var variableName = ((IdentifierToken) opTokens[1]).Name;
+                            ImpliedAssignment(opTokens.Skip(2).ToList(), variableName);
+                        }
+                        break;
+                    case "PRINT":
+                        if (opTokens[1].Type == TokenType.StringLiteral)
+                        {
+                            var text = ((StringLiteralToken)opTokens[1]).Value;
+                            Console.WriteLine(text);
+                        }
+                        else
+                        {
+                            var shuntQueue = ShuntingYard(opTokens.Skip(1).ToList());
+                            var value = EvaluatePostFix(shuntQueue);
+                            Console.WriteLine(value);
+                        }
+
+                        break;
+                    default:
+                        throw new NotImplementedException($"Unknown keyword: {keywordToken.Text}");
+                }
+            }
+            else if (firstToken.Type == TokenType.LineNumber)
+            {
+                var lineNum = ((LineNumberToken)firstToken).LineNumber;
+                var restOfLine =
+                    string.Join(" ",
+                        opTokens.Skip(1).Select(t => t.ToString())); // Reconstruct the rest of the line for storage
+                Storage.AddLine(lineNum, restOfLine);
+            }
             else
             {
                 throw new NotImplementedException("Syntax error");
@@ -59,6 +97,10 @@ namespace EchoBasic
                 switch (t.Type)
                 {
                     case TokenType.Number:
+                        outputQueue.Enqueue(t);
+                        break;
+
+                    case TokenType.Identifier:
                         outputQueue.Enqueue(t);
                         break;
 
@@ -135,6 +177,19 @@ namespace EchoBasic
                 if (t.Type == TokenType.Number)
                 {
                     operandStack.Push((NumberToken)t);
+                }
+                else if (t.Type == TokenType.Identifier)
+                {
+                    var variableName = ((IdentifierToken)t).Name;
+                    if (Storage.HasNumeric(variableName))
+                    {
+                        var value = Storage.GetNumeric(variableName); // Assuming Storage has a GetNumeric method
+                        operandStack.Push(new NumberToken(value));
+                    }
+                    else
+                    {
+                        throw new KeyNotFoundException($"Numeric variable '{variableName}' not found.");
+                    }
                 }
                 else
                 {
