@@ -39,7 +39,7 @@ namespace EchoBasic
                     tokens.Add(new NumberToken(double.Parse(numberString)));
                     parseStart += parseLength;
                 }
-                if (char.IsLetter(currentChar))
+                else if (char.IsLetter(currentChar))
                 {
                     var parseLength = 1;
                     while (parseStart + parseLength < input.Length && (char.IsLetter(input[parseStart + parseLength])))
@@ -86,6 +86,11 @@ namespace EchoBasic
                 else if (currentChar == ')')
                 {
                     tokens.Add(new OperatorToken(TokenType.RightParenthesis));
+                    parseStart++;
+                }
+                else if (currentChar == '=')
+                {
+                    tokens.Add(new OperatorToken(TokenType.Assignment));
                     parseStart++;
                 }
                 else if (char.IsWhiteSpace(currentChar))

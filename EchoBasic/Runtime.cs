@@ -1,15 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace EchoBasic
 {
-    public class Runtime
+    public static class Runtime
     {
-        public double Add(double a, double b) => a + b;
-        public double Subtract(double a, double b) => a - b;
-        public double Multiply(double a, double b) => a * b;
-        public double Divide(double a, double b)
+        public static double Add(double a, double b) => a + b;
+        public static double Subtract(double a, double b) => a - b;
+        public static double Multiply(double a, double b) => a * b;
+        public static double Divide(double a, double b)
         {
             if (b == 0)
             {
@@ -19,7 +18,37 @@ namespace EchoBasic
             return a / b;
         }
 
-        public Queue<Token> ShuntingYard(List<Token> tokens)
+        public static void RunLine(List<Token> opTokens)
+        {
+            var firstToken = opTokens[0];
+            if (firstToken.Type == TokenType.Identifier)
+            {
+                ImpliedAssignment(opTokens.Skip(1).ToList(), ((IdentifierToken) firstToken).Name);
+            }
+            else
+            {
+                throw new NotImplementedException("Syntax error");
+            }
+        }
+        
+        private static void ImpliedAssignment(List<Token> opTokens, string variableName)
+        {
+            if (opTokens.Count == 0)
+            {
+                throw new ArgumentException("Expected an expression after assignment.");
+            }
+            var secondToken = opTokens[0];
+            if (secondToken.Type != TokenType.Assignment)
+            {
+                throw new ArgumentException("Expected an =");
+            }
+
+            var shuntQueue = ShuntingYard(opTokens.Skip(1).ToList());
+            var value = EvaluatePostFix(shuntQueue);
+            Storage.AddNumeric(variableName, value);
+        }
+
+        public static Queue<Token> ShuntingYard(List<Token> tokens)
         {
             var operatorStack = new Stack<OperatorToken>();
             var outputQueue = new Queue<Token>();
@@ -46,6 +75,11 @@ namespace EchoBasic
                         PushOperator(operatorStack, outputQueue, (OperatorToken)t);
                         break;
                 }
+            }
+
+            if (parenCount > 0)
+            {
+                throw new ArgumentException("Mismatched parentheses.");
             }
 
             while (operatorStack.Any())
@@ -79,7 +113,7 @@ namespace EchoBasic
 
         private static void PushOperator(Stack<OperatorToken> operatorStack, Queue<Token> outputQueue, OperatorToken op)
         {
-            if (operatorStack.Any() && operatorStack.Peek().Type != TokenType.LeftParenthesis && operatorStack.Peek().GetPrecedence() >= op.GetPrecedence())
+            while (operatorStack.Any() && operatorStack.Peek().Type != TokenType.LeftParenthesis && operatorStack.Peek().GetPrecedence() >= op.GetPrecedence())
             {
                 outputQueue.Enqueue(operatorStack.Pop());
             }
@@ -91,7 +125,7 @@ namespace EchoBasic
         /// </summary>
         /// <param name="postfixQueue"></param>
         /// <returns></returns>
-        public double EvaluatePostFix(Queue<Token> postfixQueue)
+        public static double EvaluatePostFix(Queue<Token> postfixQueue)
         {
             Stack<NumberToken> operandStack = new();
 
@@ -132,13 +166,13 @@ namespace EchoBasic
             return operandStack.Pop().Value;
         }
 
-        public double Calculate(string input)
-        {
-            var tokens = Parser.Tokenise(input);
-            var postfixQueue = ShuntingYard(tokens);
-            var result = EvaluatePostFix(postfixQueue);
+        //public static double Calculate(string input)
+        //{
+        //    var tokens = Parser.Tokenise(input);
+        //    var postfixQueue = ShuntingYard(tokens);
+        //    var result = EvaluatePostFix(postfixQueue);
 
-            return result;
-        }
+        //    return result;
+        //}
     }
 }

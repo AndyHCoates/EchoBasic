@@ -30,6 +30,10 @@ while (running)
                 var lineText = input.Substring(numberString.Length).TrimStart();
                 Storage.AddLine(number, lineText);
             }
+            else
+            {
+                Runtime.RunLine(tokens);
+            }
         }
     }
 }

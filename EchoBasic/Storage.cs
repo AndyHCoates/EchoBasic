@@ -22,6 +22,52 @@ namespace EchoBasic
             }
             _programLines[number] = text;
         }
+
+        public static void AddNumeric(string text, double number)
+        {
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                throw new ArgumentException("Numeric variable name cannot be null or empty.", nameof(text));
+            }
+
+            _numberVariables[text] = number;
+        }
+
+        public static string GetLine(int number)
+        {
+            if (!_programLines.TryGetValue(number, out string? line))
+            {
+                throw new KeyNotFoundException($"Line number {number} not found.");
+            }
+
+            return line;
+        }
+
+        public static double GetNumeric(string text)
+        {
+            if (!_numberVariables.TryGetValue(text, out double value))
+            {
+                throw new KeyNotFoundException($"Numeric variable '{text}' not found.");
+            }
+
+            return value;
+        }
+
+        public static bool HasLine(int number)
+        {
+            return _programLines.ContainsKey(number);
+        }
+
+        public static bool HasNumeric(string text)
+        {
+            return _numberVariables.ContainsKey(text);
+        }
+
+        public static void Clear()
+        {
+            _programLines.Clear();
+            _numberVariables.Clear();
+        }
     }
     
 }
