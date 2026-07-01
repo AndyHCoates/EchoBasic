@@ -1,6 +1,7 @@
 <Solution>
   <Folder Name="/Solution Items/">
     <File Path=".github/workflows/ci.yml" />
+    <File Path="README.md" />
   </Folder>
   <Project Path="EchoBasic.Tests/EchoBasic.Tests.csproj" />
   <Project Path="EchoBasic/EchoBasic.csproj" />

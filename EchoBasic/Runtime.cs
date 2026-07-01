@@ -18,7 +18,7 @@ namespace EchoBasic
             return a / b;
         }
 
-        public static void RunLine(List<Token> opTokens)
+        public static int RunLine(List<Token> opTokens)
         {
             var firstToken = opTokens[0];
             if (firstToken.Type == TokenType.Identifier)
@@ -49,7 +49,11 @@ namespace EchoBasic
                             var value = EvaluatePostFix(shuntQueue);
                             Console.WriteLine(value);
                         }
-
+                        break;
+                    case "GOTO":
+                        var gotoShuntQueue = ShuntingYard(opTokens.Skip(1).ToList());
+                        var gotoValue = EvaluatePostFix(gotoShuntQueue);
+                        return (int)gotoValue;
                         break;
                     default:
                         throw new NotImplementedException($"Unknown keyword: {keywordToken.Text}");
@@ -67,6 +71,8 @@ namespace EchoBasic
             {
                 throw new NotImplementedException("Syntax error");
             }
+
+            return 0;
         }
         
         private static void ImpliedAssignment(List<Token> opTokens, string variableName)
@@ -219,6 +225,29 @@ namespace EchoBasic
             }
 
             return operandStack.Pop().Value;
+        }
+
+        public static void Run(int startLine = 0)
+        {
+            var lineNumber = Storage.GetNextLine(startLine);
+
+            while (lineNumber != 0)
+            {
+                var line = Storage.GetLine(lineNumber);
+                var tokens = Parser.Tokenise(line);
+                var nextLine = RunLine(tokens);
+
+                if (nextLine == 0)
+                {
+                    lineNumber++;
+                }
+                else
+                {
+                    lineNumber = nextLine;
+                }
+
+                lineNumber = Storage.GetNextLine(lineNumber);
+            }
         }
 
         //public static double Calculate(string input)

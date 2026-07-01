@@ -6,7 +6,7 @@ namespace EchoBasic
 {
     public static class Storage
     {
-        private static Dictionary<int, string> _programLines = [];
+        private static SortedList<int, string> _programLines = [];
         private static Dictionary<string, double> _numberVariables = [];
         
         public static void AddLine(int number, string text)
@@ -67,6 +67,25 @@ namespace EchoBasic
         {
             _programLines.Clear();
             _numberVariables.Clear();
+        }
+        
+        public static int GetLastLine()
+        {
+            if (_programLines.Count == 0)
+            {
+                return 0;
+            }
+            return _programLines.Keys[^1]; // Get the last key in the sorted list
+        }
+
+        public static int GetNextLine(int searchLine)
+        {
+            return _programLines.Keys.FirstOrDefault(lineNumber => lineNumber >= searchLine);
+        }
+
+        public static void ListProgram()
+        {
+            foreach (var line in _programLines) Console.WriteLine($"{line.Key} {line.Value}");
         }
     }
     

@@ -43,7 +43,7 @@ namespace EchoBasic
 
     public sealed class KeywordToken(string text) : Token(TokenType.Keyword)
     {
-        private string[] _validKeywords = ["PRINT", "LET"];
+        private string[] _validKeywords = ["PRINT", "LET", "GOTO"];
 
         public string Text { get; } = text;
 
@@ -99,4 +99,5 @@ namespace EchoBasic
             return $"{Type}, \"{Value}\"";
         }
     }
+    
 }

@@ -11,28 +11,41 @@ while (running)
     input = input.ToUpper();
     if (!string.IsNullOrEmpty(input))
     {
-        if (input == "EXIT")
+        switch (input)
         {
-            running = false;
-        }
-        else
-        {
-            var tokens = Parser.Tokenise(input, true);
-            if (!tokens.Any())
+            case "EXIT":
+                running = false;
+                break;
+            case "RUN":
+                Runtime.Run();
+                break;
+            case "LIST":
+                Storage.ListProgram();
+                break;
+            case "NEW":
+                Storage.Clear();
+                break;
+            default:
             {
-                continue;
-            }
+                var tokens = Parser.Tokenise(input, true);
+                if (!tokens.Any())
+                {
+                    continue;
+                }
 
-            if (tokens[0].Type == TokenType.LineNumber)
-            {
-                var number = ((LineNumberToken)tokens[0]).LineNumber;
-                var numberString = number.ToString();
-                var lineText = input.Substring(numberString.Length).TrimStart();
-                Storage.AddLine(number, lineText);
-            }
-            else
-            {
-                Runtime.RunLine(tokens);
+                if (tokens[0].Type == TokenType.LineNumber)
+                {
+                    var number = ((LineNumberToken)tokens[0]).LineNumber;
+                    var numberString = number.ToString();
+                    var lineText = input.Substring(numberString.Length).TrimStart();
+                    Storage.AddLine(number, lineText);
+                }
+                else
+                {
+                    Runtime.RunLine(tokens);
+                }
+
+                break;
             }
         }
     }

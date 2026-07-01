@@ -143,12 +143,7 @@ namespace EchoBasic.Tests
         {
             Assert.That(new KeywordToken("PRINT").IsValid(), Is.True);
             Assert.That(new KeywordToken("LET").IsValid(), Is.True);
-        }
-
-        [Test]
-        public void KeywordTokenInvalidKeywordIsValidReturnsFalse()
-        {
-            Assert.That(new KeywordToken("GOTO").IsValid(), Is.False);
+            Assert.That(new KeywordToken("GOTO").IsValid(), Is.True);
         }
     }
 
@@ -487,6 +482,139 @@ namespace EchoBasic.Tests
             };
             var queue = Runtime.ShuntingYard(tokens);
             Assert.Throws<DivideByZeroException>(() => Runtime.EvaluatePostFix(queue));
+        }
+    }
+
+    [TestFixture]
+    public class CommandTests
+    {
+        private StringWriter _output;
+
+        [SetUp]
+        public void SetUp()
+        {
+            Storage.Clear();
+            _output = new StringWriter();
+            Console.SetOut(_output);
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            _output.Dispose();
+            Console.SetOut(Console.Out);
+        }
+
+        // NEW tests
+
+        [Test]
+        public void NewClearsStoredLines()
+        {
+            Storage.AddLine(10, "PRINT 10");
+            Storage.Clear();
+            Assert.That(Storage.HasLine(10), Is.False);
+        }
+
+        [Test]
+        public void NewClearsNumericVariables()
+        {
+            Storage.AddNumeric("X", 42);
+            Storage.Clear();
+            Assert.That(Storage.HasNumeric("X"), Is.False);
+        }
+
+        [Test]
+        public void NewClearsMultipleLinesAndVariables()
+        {
+            Storage.AddLine(10, "PRINT 1");
+            Storage.AddLine(20, "PRINT 2");
+            Storage.AddNumeric("A", 1);
+            Storage.AddNumeric("B", 2);
+            Storage.Clear();
+            Assert.That(Storage.HasLine(10), Is.False);
+            Assert.That(Storage.HasLine(20), Is.False);
+            Assert.That(Storage.HasNumeric("A"), Is.False);
+            Assert.That(Storage.HasNumeric("B"), Is.False);
+        }
+
+        // LIST tests
+
+        [Test]
+        public void ListOutputsStoredLineWithLineNumber()
+        {
+            Storage.AddLine(10, "PRINT 10");
+            Storage.ListProgram();
+            var result = _output.ToString().Trim();
+            Assert.That(result, Is.EqualTo("10 PRINT 10"));
+        }
+
+        [Test]
+        public void ListWithNoLinesProducesNoOutput()
+        {
+            Storage.ListProgram();
+            Assert.That(_output.ToString(), Is.Empty);
+        }
+
+        [Test]
+        public void ListOutputsMultipleLinesInLineNumberOrder()
+        {
+            Storage.AddLine(20, "PRINT 2");
+            Storage.AddLine(10, "PRINT 1");
+            Storage.ListProgram();
+            var lines = _output.ToString().Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
+            Assert.That(lines, Has.Length.EqualTo(2));
+            Assert.That(lines[0], Is.EqualTo("10 PRINT 1"));
+            Assert.That(lines[1], Is.EqualTo("20 PRINT 2"));
+        }
+
+        // RUN tests
+
+        [Test]
+        public void RunWithNoLinesDoesNothing()
+        {
+            Assert.DoesNotThrow(() => Runtime.Run());
+            Assert.That(_output.ToString(), Is.Empty);
+        }
+
+        [Test]
+        public void RunExecutesSinglePrintStatement()
+        {
+            Storage.AddLine(10, "PRINT 42");
+            Runtime.Run();
+            Assert.That(_output.ToString().Trim(), Is.EqualTo("42"));
+        }
+
+        [Test]
+        public void RunExecutesMultipleLinesInOrder()
+        {
+            Storage.AddLine(10, "PRINT 1");
+            Storage.AddLine(20, "PRINT 2");
+            Runtime.Run();
+            var lines = _output.ToString().Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
+            Assert.That(lines, Has.Length.EqualTo(2));
+            Assert.That(lines[0], Is.EqualTo("1"));
+            Assert.That(lines[1], Is.EqualTo("2"));
+        }
+
+        [Test]
+        public void RunExecutesAssignmentAndPrint()
+        {
+            Storage.AddLine(10, "LET X = 7");
+            Storage.AddLine(20, "PRINT X");
+            Runtime.Run();
+            Assert.That(_output.ToString().Trim(), Is.EqualTo("7"));
+        }
+
+        [Test]
+        public void RunWithGotoJumpsToCorrectLine()
+        {
+            Storage.AddLine(10, "GOTO 30");
+            Storage.AddLine(20, "PRINT 99");
+            Storage.AddLine(30, "PRINT 42");
+            Runtime.Run();
+            var lines = _output.ToString().Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
+            Assert.That(lines, Has.Length.EqualTo(1));
+            Assert.That(lines[0], Is.EqualTo("42"));
         }
     }
 }
