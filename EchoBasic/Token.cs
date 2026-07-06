@@ -16,7 +16,8 @@ namespace EchoBasic
         RightParenthesis,
         Assignment,
         Keyword,
-        Identifier,
+        NumericIdentifier,
+        StringIdentifier,
         LineNumber,
         StringLiteral
     }
@@ -73,7 +74,7 @@ namespace EchoBasic
         }
     }
     
-    public sealed class IdentifierToken(string name) : Token(TokenType.Identifier)
+    public sealed class NumericIdentifierToken(string name) : Token(TokenType.NumericIdentifier)
     {
         public string Name { get; } = name;
         public override string ToString()
@@ -81,7 +82,16 @@ namespace EchoBasic
             return $"{Type}, {Name}";
         }
     }
-    
+
+    public sealed class StringIdentifierToken(string name) : Token(TokenType.StringIdentifier)
+    {
+        public string Name { get; } = name;
+        public override string ToString()
+        {
+            return $"{Type}, {Name}";
+        }
+    }
+
     public sealed class LineNumberToken(int lineNumber) : Token(TokenType.LineNumber)
     {
         public int LineNumber { get; } = lineNumber;

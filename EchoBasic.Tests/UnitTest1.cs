@@ -61,7 +61,7 @@ namespace EchoBasic.Tests
         {
             var tokens = Parser.Tokenise("x = 5 + 3");
             Assert.That(tokens, Has.Count.EqualTo(5));
-            Assert.That(tokens[0].Type, Is.EqualTo(TokenType.Identifier));
+            Assert.That(tokens[0].Type, Is.EqualTo(TokenType.NumericIdentifier));
             Assert.That(tokens[1].Type, Is.EqualTo(TokenType.Assignment));
             Assert.That(tokens[2].Type, Is.EqualTo(TokenType.Number));
             Assert.That(tokens[3].Type, Is.EqualTo(TokenType.Plus));
@@ -206,6 +206,7 @@ namespace EchoBasic.Tests
         [SetUp]
         public void Setup()
         {
+            Storage.Clear();
             _output = new StringWriter();
             Console.SetOut(_output);
         }
@@ -253,6 +254,47 @@ namespace EchoBasic.Tests
             Runtime.RunLine(tokens);
             var result = _output.ToString().Trim();
             Assert.That(result, Is.EqualTo("11"));
+        }
+
+        [Test]
+        public void PrintStringLiteral()
+        {
+            var tokens = Parser.Tokenise("PRINT \"HELLO\"", true);
+            Runtime.RunLine(tokens);
+            Assert.That(_output.ToString().Trim(), Is.EqualTo("HELLO"));
+        }
+
+        [Test]
+        public void PrintStringLiteralWithSpaces()
+        {
+            var tokens = Parser.Tokenise("PRINT \"HELLO WORLD\"", true);
+            Runtime.RunLine(tokens);
+            Assert.That(_output.ToString().Trim(), Is.EqualTo("HELLO WORLD"));
+        }
+
+        [Test]
+        public void PrintStringVariable()
+        {
+            Storage.AddString("A$", "HELLO");
+            var tokens = Parser.Tokenise("PRINT A$", true);
+            Runtime.RunLine(tokens);
+            Assert.That(_output.ToString().Trim(), Is.EqualTo("HELLO"));
+        }
+
+        [Test]
+        public void PrintStringVariableAfterAssignment()
+        {
+            var assignTokens = Parser.Tokenise("LET A$ = \"WORLD\"", true);
+            Runtime.RunLine(assignTokens);
+            var printTokens = Parser.Tokenise("PRINT A$", true);
+            Runtime.RunLine(printTokens);
+            Assert.That(_output.ToString().Trim(), Is.EqualTo("WORLD"));
+        }
+        [Test]
+        public void PrintUnknownStringVariableThrowsKeyNotFoundException()
+        {
+            var tokens = Parser.Tokenise("PRINT B$", true);
+            Assert.Throws<KeyNotFoundException>(() => Runtime.RunLine(tokens));
         }
     }
 

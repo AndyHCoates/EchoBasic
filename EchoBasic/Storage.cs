@@ -8,6 +8,7 @@ namespace EchoBasic
     {
         private static SortedList<int, string> _programLines = [];
         private static Dictionary<string, double> _numberVariables = [];
+        private static Dictionary<string, string> _stringVariables = [];
         
         public static void AddLine(int number, string text)
         {
@@ -32,6 +33,15 @@ namespace EchoBasic
 
             _numberVariables[text] = number;
         }
+        
+        public static void AddString(string name, string value)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                throw new ArgumentException("String variable name cannot be null or empty.", nameof(name));
+            }
+            _stringVariables[name] = value;
+        }
 
         public static string GetLine(int number)
         {
@@ -52,6 +62,13 @@ namespace EchoBasic
 
             return value;
         }
+        
+        public static string GetString(string name)
+        {
+            if (!_stringVariables.TryGetValue(name, out var value)) throw new KeyNotFoundException($"String variable '{name}' not found.");
+
+            return value;
+        }
 
         public static bool HasLine(int number)
         {
@@ -67,6 +84,7 @@ namespace EchoBasic
         {
             _programLines.Clear();
             _numberVariables.Clear();
+            _stringVariables.Clear();
         }
         
         public static int GetLastLine()

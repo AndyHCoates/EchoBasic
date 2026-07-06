@@ -39,10 +39,10 @@ namespace EchoBasic
                     tokens.Add(new NumberToken(double.Parse(numberString)));
                     parseStart += parseLength;
                 }
-                else if (char.IsLetter(currentChar))
+                else if (char.IsLetter(currentChar) || currentChar == '$')
                 {
                     var parseLength = 1;
-                    while (parseStart + parseLength < input.Length && (char.IsLetter(input[parseStart + parseLength])))
+                    while (parseStart + parseLength < input.Length && (char.IsLetter(input[parseStart + parseLength]) || input[parseStart + parseLength] == '$'))
                     {
                         parseLength++;
                     }
@@ -52,9 +52,20 @@ namespace EchoBasic
                     {
                         tokens.Add(new KeywordToken(statementString));
                     }
+                    else if (statementString.Contains('$'))
+                    {
+                        if (statementString.EndsWith('$'))
+                        {
+                            tokens.Add(new StringIdentifierToken(statementString));
+                        }
+                        else
+                        {
+                            throw new ArgumentException("Invalid NumericIdentifier");
+                        }
+                    }
                     else
                     {
-                        tokens.Add(new IdentifierToken(statementString));
+                        tokens.Add(new NumericIdentifierToken(statementString));
                     }
                     parseStart += parseLength;
                 }

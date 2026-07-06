@@ -21,9 +21,14 @@ namespace EchoBasic
         public static int RunLine(List<Token> opTokens)
         {
             var firstToken = opTokens[0];
-            if (firstToken.Type == TokenType.Identifier)
+            if (firstToken.Type == TokenType.NumericIdentifier)
             {
-                ImpliedAssignment(opTokens.Skip(1).ToList(), ((IdentifierToken) firstToken).Name);
+                ImpliedNumericAssignment(opTokens.Skip(1).ToList(), ((NumericIdentifierToken) firstToken).Name);
+            }
+            else if (firstToken.Type == TokenType.StringIdentifier)
+            {
+                var variableName = ((StringIdentifierToken)firstToken).Name;
+                ImpliedStringAssignment(opTokens.Skip(1).ToList(), variableName);
             }
             else if (firstToken.Type == TokenType.Keyword)
             {
@@ -31,16 +36,26 @@ namespace EchoBasic
                 switch (keywordToken.Text.ToUpper())
                 {
                     case "LET":
-                        if (opTokens[1].Type == TokenType.Identifier)
+                        if (opTokens[1].Type == TokenType.NumericIdentifier)
                         {
-                            var variableName = ((IdentifierToken) opTokens[1]).Name;
-                            ImpliedAssignment(opTokens.Skip(2).ToList(), variableName);
+                            var variableName = ((NumericIdentifierToken) opTokens[1]).Name;
+                            ImpliedNumericAssignment(opTokens.Skip(2).ToList(), variableName);
+                        }
+                        else if (opTokens[1].Type == TokenType.StringIdentifier)
+                        {
+                            var variableName = ((StringIdentifierToken)opTokens[1]).Name;
+                            ImpliedStringAssignment(opTokens.Skip(2).ToList(), variableName);
                         }
                         break;
                     case "PRINT":
                         if (opTokens[1].Type == TokenType.StringLiteral)
                         {
                             var text = ((StringLiteralToken)opTokens[1]).Value;
+                            Console.WriteLine(text);
+                        }
+                        else if (opTokens[1].Type == TokenType.StringIdentifier)
+                        {
+                            var text = Storage.GetString(((StringIdentifierToken)opTokens[1]).Name);
                             Console.WriteLine(text);
                         }
                         else
@@ -75,7 +90,7 @@ namespace EchoBasic
             return 0;
         }
         
-        private static void ImpliedAssignment(List<Token> opTokens, string variableName)
+        private static void ImpliedNumericAssignment(List<Token> opTokens, string variableName)
         {
             if (opTokens.Count == 0)
             {
@@ -91,6 +106,19 @@ namespace EchoBasic
             var value = EvaluatePostFix(shuntQueue);
             Storage.AddNumeric(variableName, value);
         }
+        
+        private static void ImpliedStringAssignment(List<Token> opTokens, string variableName)
+        {
+            if (opTokens.Count == 0) throw new ArgumentException("No tokens provided for string assignment.", nameof(opTokens));
+
+            var secondToken = opTokens[0];
+            if (secondToken.Type != TokenType.Assignment) throw new InvalidOperationException("Expected an assignment token.");
+
+            if (opTokens.Count < 2 || opTokens[1].Type != TokenType.StringLiteral) throw new InvalidOperationException("Expected a string literal after the assignment token.");
+
+            var stringLiteralToken = (StringLiteralToken)opTokens[1];
+            Storage.AddString(variableName, stringLiteralToken.Value);
+        }
 
         public static Queue<Token> ShuntingYard(List<Token> tokens)
         {
@@ -103,10 +131,10 @@ namespace EchoBasic
                 switch (t.Type)
                 {
                     case TokenType.Number:
-                        outputQueue.Enqueue(t);
-                        break;
 
-                    case TokenType.Identifier:
+                    case TokenType.NumericIdentifier:
+
+                    case TokenType.StringIdentifier:
                         outputQueue.Enqueue(t);
                         break;
 
@@ -184,9 +212,9 @@ namespace EchoBasic
                 {
                     operandStack.Push((NumberToken)t);
                 }
-                else if (t.Type == TokenType.Identifier)
+                else if (t.Type == TokenType.NumericIdentifier)
                 {
-                    var variableName = ((IdentifierToken)t).Name;
+                    var variableName = ((NumericIdentifierToken)t).Name;
                     if (Storage.HasNumeric(variableName))
                     {
                         var value = Storage.GetNumeric(variableName); // Assuming Storage has a GetNumeric method
