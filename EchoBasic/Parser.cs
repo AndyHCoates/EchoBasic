@@ -60,7 +60,7 @@ namespace EchoBasic
                         }
                         else
                         {
-                            throw new ArgumentException("Invalid NumericIdentifier");
+                            throw new BasicException(ErrorCode.SyntaxError, "Invalid Numeric Variable");
                         }
                     }
                     else

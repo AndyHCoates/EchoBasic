@@ -12,7 +12,7 @@ namespace EchoBasic
         {
             if (b == 0)
             {
-                throw new DivideByZeroException("Cannot divide by zero.");
+                throw new BasicException(ErrorCode.DivisionByZero, "Cannot divide by zero.");
             }
 
             return a / b;
@@ -94,12 +94,12 @@ namespace EchoBasic
         {
             if (opTokens.Count == 0)
             {
-                throw new ArgumentException("Expected an expression after assignment.");
+                throw new BasicException(ErrorCode.SyntaxError, "Expected an expression after assignment.");
             }
             var secondToken = opTokens[0];
             if (secondToken.Type != TokenType.Assignment)
             {
-                throw new ArgumentException("Expected an =");
+                throw new BasicException(ErrorCode.SyntaxError, "Expected an =");
             }
 
             var shuntQueue = ShuntingYard(opTokens.Skip(1).ToList());
@@ -109,12 +109,12 @@ namespace EchoBasic
         
         private static void ImpliedStringAssignment(List<Token> opTokens, string variableName)
         {
-            if (opTokens.Count == 0) throw new ArgumentException("No tokens provided for string assignment.", nameof(opTokens));
+            if (opTokens.Count == 0) throw new BasicException(ErrorCode.SyntaxError, "No string found");
 
             var secondToken = opTokens[0];
-            if (secondToken.Type != TokenType.Assignment) throw new InvalidOperationException("Expected an assignment token.");
+            if (secondToken.Type != TokenType.Assignment) throw new BasicException(ErrorCode.SyntaxError, "Expected an =");
 
-            if (opTokens.Count < 2 || opTokens[1].Type != TokenType.StringLiteral) throw new InvalidOperationException("Expected a string literal after the assignment token.");
+            if (opTokens.Count < 2 || opTokens[1].Type != TokenType.StringLiteral) throw new BasicException(ErrorCode.SyntaxError, "Expected a string after the =");
 
             var stringLiteralToken = (StringLiteralToken)opTokens[1];
             Storage.AddString(variableName, stringLiteralToken.Value);
@@ -155,7 +155,7 @@ namespace EchoBasic
 
             if (parenCount > 0)
             {
-                throw new ArgumentException("Mismatched parentheses.");
+                throw new BasicException(ErrorCode.Parenthesis, "Mismatched parentheses.");
             }
 
             while (operatorStack.Any())
@@ -170,7 +170,7 @@ namespace EchoBasic
         {
             if (parenCount == 0)
             {
-                throw new ArgumentException("Mismatched parentheses.");
+                throw new BasicException(ErrorCode.Parenthesis, "Mismatched parentheses.");
             }
 
             while (operatorStack.Any() && operatorStack.Peek().Type != TokenType.LeftParenthesis)
@@ -180,7 +180,7 @@ namespace EchoBasic
 
             if (!operatorStack.Any() || operatorStack.Peek().Type != TokenType.LeftParenthesis)
             {
-                throw new ArgumentException("Mismatched parentheses.");
+                throw new BasicException(ErrorCode.Parenthesis, "Mismatched parentheses.");
             }
 
             operatorStack.Pop(); // Discard the left parenthesis
@@ -262,9 +262,16 @@ namespace EchoBasic
             while (lineNumber != 0)
             {
                 var line = Storage.GetLine(lineNumber);
-                var tokens = Parser.Tokenise(line);
-                var nextLine = RunLine(tokens);
-
+                var tokens = Parser.Tokenise(line); 
+                int nextLine;
+                try
+                {
+                    nextLine = RunLine(tokens);
+                }
+                catch (BasicException ex) when (ex.LineNumber == 0)
+                {
+                    throw (new BasicException(ex.Code, ex.Message, lineNumber));
+                }
                 if (nextLine == 0)
                 {
                     lineNumber++;

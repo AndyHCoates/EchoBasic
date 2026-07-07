@@ -40,7 +40,9 @@ namespace EchoBasic.Tests
         [Test]
         public void DivideByZero()
         {
-            Assert.Throws<DivideByZeroException>(() => Runtime.Divide(10, 0));
+            var ex = Assert.Throws<BasicException>(() => Runtime.Divide(10, 0));
+            Assert.That(ex.Code, Is.EqualTo(ErrorCode.DivisionByZero));
+            Assert.That(ex.Message, Is.EqualTo("Cannot divide by zero."));
         }
     }
 
@@ -186,14 +188,18 @@ namespace EchoBasic.Tests
         public void LineNumberStorageWithInvalidLineNumberThrowsException()
         {
             var tokens = Parser.Tokenise("0 LET X = 5", true);
-            Assert.Throws<ArgumentOutOfRangeException>(() => Runtime.RunLine(tokens));
+            var ex = Assert.Throws<BasicException>(() => Runtime.RunLine(tokens));
+            Assert.That(ex.Code, Is.EqualTo(ErrorCode.LineNumber));
+            Assert.That(ex.Message, Is.EqualTo("Line numbers must be positive."));
         }
 
         [Test]
         public void LineNumberStorageWithEmptyTextThrowsException()
         {
             var tokens = Parser.Tokenise("10 ", true);
-            Assert.Throws<ArgumentException>(() => Runtime.RunLine(tokens));
+            var ex = Assert.Throws<BasicException>(() => Runtime.RunLine(tokens));
+            Assert.That(ex.Code, Is.EqualTo(ErrorCode.EmptyLine));
+            Assert.That(ex.Message, Is.EqualTo("Program line text cannot be empty."));
         }
         
     }
@@ -316,25 +322,33 @@ namespace EchoBasic.Tests
         [Test]
         public void AddLineNegativeLineNumberShouldThrowException()
         {
-            Assert.Throws<ArgumentOutOfRangeException>(() => Storage.AddLine(-1, "PRINT 10"));
+            var ex = Assert.Throws<BasicException>(() => Storage.AddLine(-1, "PRINT 10"));
+            Assert.That(ex.Code, Is.EqualTo(ErrorCode.LineNumber));
+            Assert.That(ex.Message, Is.EqualTo("Line numbers must be positive."));
         }
 
         [Test]
         public void AddLineEmptyTextShouldThrowException()
         {
-            Assert.Throws<ArgumentException>(() => Storage.AddLine(10, ""));
+            var ex = Assert.Throws<BasicException>(() => Storage.AddLine(10, ""));
+            Assert.That(ex.Code, Is.EqualTo(ErrorCode.EmptyLine));
+            Assert.That(ex.Message, Is.EqualTo("Program line text cannot be empty."));
         }
 
         [Test]
         public void AddLineZeroLineNumberShouldThrowException()
         {
-            Assert.Throws<ArgumentOutOfRangeException>(() => Storage.AddLine(0, "PRINT 10"));
+            var ex = Assert.Throws<BasicException>(() => Storage.AddLine(0, "PRINT 10"));
+            Assert.That(ex.Code, Is.EqualTo(ErrorCode.LineNumber));
+            Assert.That(ex.Message, Is.EqualTo("Line numbers must be positive."));
         }
 
         [Test]
         public void AddLineWhitespaceOnlyTextShouldThrowException()
         {
-            Assert.Throws<ArgumentException>(() => Storage.AddLine(10, "   "));
+            var ex = Assert.Throws<BasicException>(() => Storage.AddLine(10, "   "));
+            Assert.That(ex.Code, Is.EqualTo(ErrorCode.EmptyLine));
+            Assert.That(ex.Message, Is.EqualTo("Program line text cannot be empty."));
         }
 
         [Test]
@@ -497,7 +511,9 @@ namespace EchoBasic.Tests
                 new OperatorToken(TokenType.Plus),
                 new NumberToken(3)
             };
-            Assert.Throws<ArgumentException>(() => Runtime.ShuntingYard(tokens));
+            var ex = Assert.Throws<BasicException>(() => Runtime.ShuntingYard(tokens));
+            Assert.That(ex.Code, Is.EqualTo(ErrorCode.Parenthesis));
+            Assert.That(ex.Message, Is.EqualTo("Mismatched parentheses."));
         }
 
         [Test]
@@ -510,7 +526,9 @@ namespace EchoBasic.Tests
                 new NumberToken(3),
                 new OperatorToken(TokenType.RightParenthesis)
             };
-            Assert.Throws<ArgumentException>(() => Runtime.ShuntingYard(tokens));
+            var ex = Assert.Throws<BasicException>(() => Runtime.ShuntingYard(tokens));
+            Assert.That(ex.Code, Is.EqualTo(ErrorCode.Parenthesis));
+            Assert.That(ex.Message, Is.EqualTo("Mismatched parentheses."));
         }
 
         [Test]
@@ -523,7 +541,9 @@ namespace EchoBasic.Tests
                 new NumberToken(0)
             };
             var queue = Runtime.ShuntingYard(tokens);
-            Assert.Throws<DivideByZeroException>(() => Runtime.EvaluatePostFix(queue));
+            var ex = Assert.Throws<BasicException>(() => Runtime.EvaluatePostFix(queue));
+            Assert.That(ex.Code, Is.EqualTo(ErrorCode.DivisionByZero));
+            Assert.That(ex.Message, Is.EqualTo("Cannot divide by zero."));
         }
     }
 

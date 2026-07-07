@@ -17,7 +17,14 @@ while (running)
                 running = false;
                 break;
             case "RUN":
-                Runtime.Run();
+                try
+                {
+                    Runtime.Run();
+                }
+                catch (BasicException ex)
+                {
+                    Console.WriteLine($"Error at line {ex.LineNumber}: {ex.Message}");
+                }
                 break;
             case "LIST":
                 Storage.ListProgram();
@@ -35,14 +42,28 @@ while (running)
 
                 if (tokens[0].Type == TokenType.LineNumber)
                 {
-                    var number = ((LineNumberToken)tokens[0]).LineNumber;
-                    var numberString = number.ToString();
-                    var lineText = input.Substring(numberString.Length).TrimStart();
-                    Storage.AddLine(number, lineText);
+                    try
+                    {
+                        var number = ((LineNumberToken)tokens[0]).LineNumber;
+                        var numberString = number.ToString();
+                        var lineText = input.Substring(numberString.Length).TrimStart();
+                        Storage.AddLine(number, lineText);
+                    }
+                    catch(BasicException ex)
+                    {
+                        Console.WriteLine($"Error at line: {ex.LineNumber} -> {ex.Message}");
+                    }
                 }
                 else
                 {
-                    Runtime.RunLine(tokens);
+                    try
+                    {
+                        Runtime.RunLine(tokens);
+                    }
+                    catch (BasicException ex)
+                    {
+                        Console.WriteLine($"Error -> {ex.Message}");
+                    }
                 }
 
                 break;

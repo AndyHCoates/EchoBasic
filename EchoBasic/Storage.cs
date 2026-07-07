@@ -14,12 +14,12 @@ namespace EchoBasic
         {
             if (number <= 0)
             {
-                throw new ArgumentOutOfRangeException(nameof(number), "Line numbers must be positive.");
+                throw new BasicException(ErrorCode.LineNumber, "Line numbers must be positive.", number);
             }
 
             if (string.IsNullOrWhiteSpace(text))
             {
-                throw new ArgumentException("Program line text cannot be null or empty.", nameof(text));
+                throw new BasicException(ErrorCode.EmptyLine, "Program line text cannot be empty.", number);
             }
             _programLines[number] = text;
         }
@@ -28,7 +28,7 @@ namespace EchoBasic
         {
             if (string.IsNullOrWhiteSpace(text))
             {
-                throw new ArgumentException("Numeric variable name cannot be null or empty.", nameof(text));
+                throw new BasicException(ErrorCode.SyntaxError, "Numeric variable name cannot be null or empty");
             }
 
             _numberVariables[text] = number;
@@ -38,7 +38,7 @@ namespace EchoBasic
         {
             if (string.IsNullOrWhiteSpace(name))
             {
-                throw new ArgumentException("String variable name cannot be null or empty.", nameof(name));
+                throw new BasicException(ErrorCode.SyntaxError, "String variable name cannot be null or empty");
             }
             _stringVariables[name] = value;
         }
