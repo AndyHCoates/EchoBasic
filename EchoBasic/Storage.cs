@@ -7,7 +7,7 @@ namespace EchoBasic
     public static class Storage
     {
         private static SortedList<int, string> _programLines = [];
-        private static Dictionary<string, double> _numberVariables = [];
+        private static Dictionary<string, int> _numberVariables = [];
         private static Dictionary<string, string> _stringVariables = [];
         
         public static void AddLine(int number, string text)
@@ -24,7 +24,7 @@ namespace EchoBasic
             _programLines[number] = text;
         }
 
-        public static void AddNumeric(string text, double number)
+        public static void AddNumeric(string text, int number)
         {
             if (string.IsNullOrWhiteSpace(text))
             {
@@ -53,9 +53,9 @@ namespace EchoBasic
             return line;
         }
 
-        public static double GetNumeric(string text)
+        public static int GetNumeric(string text)
         {
-            if (!_numberVariables.TryGetValue(text, out double value))
+            if (!_numberVariables.TryGetValue(text, out int value))
             {
                 throw new KeyNotFoundException($"Numeric variable '{text}' not found.");
             }

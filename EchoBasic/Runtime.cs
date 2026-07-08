@@ -5,10 +5,10 @@ namespace EchoBasic
 {
     public static class Runtime
     {
-        public static double Add(double a, double b) => a + b;
-        public static double Subtract(double a, double b) => a - b;
-        public static double Multiply(double a, double b) => a * b;
-        public static double Divide(double a, double b)
+        public static int Add(int a, int b) => a + b;
+        public static int Subtract(int a, int b) => a - b;
+        public static int Multiply(int a, int b) => a * b;
+        public static int Divide(int a, int b)
         {
             if (b == 0)
             {
@@ -68,7 +68,7 @@ namespace EchoBasic
                     case "GOTO":
                         var gotoShuntQueue = ShuntingYard(opTokens.Skip(1).ToList());
                         var gotoValue = EvaluatePostFix(gotoShuntQueue);
-                        return (int)gotoValue;
+                        return gotoValue;
                         break;
                     default:
                         throw new NotImplementedException($"Unknown keyword: {keywordToken.Text}");
@@ -201,7 +201,7 @@ namespace EchoBasic
         /// </summary>
         /// <param name="postfixQueue"></param>
         /// <returns></returns>
-        public static double EvaluatePostFix(Queue<Token> postfixQueue)
+        public static int EvaluatePostFix(Queue<Token> postfixQueue)
         {
             Stack<NumberToken> operandStack = new();
 
@@ -229,7 +229,7 @@ namespace EchoBasic
                 {
                     var first = operandStack.Pop();
                     var second = operandStack.Pop();
-                    var result = 0.0;
+                    var result = 0;
                     switch (t.Type)
                     {
                         case TokenType.Plus:

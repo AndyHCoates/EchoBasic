@@ -245,11 +245,11 @@ namespace EchoBasic.Tests
         [Test]
         public void PrintVariable()
         {
-            Storage.AddNumeric("x", 16.4);
+            Storage.AddNumeric("x", 16);
             var tokens = Parser.Tokenise("print x", true);
             Runtime.RunLine(tokens);
             var result = _output.ToString().Trim();
-            Assert.That(result, Is.EqualTo("16.4"));
+            Assert.That(result, Is.EqualTo("16"));
         }
 
         [Test]
@@ -367,8 +367,8 @@ namespace EchoBasic.Tests
         [Test]
         public void AddNumericAndGetNumericRoundTrip()
         {
-            Storage.AddNumeric("x", 3.14);
-            Assert.That(Storage.GetNumeric("x"), Is.EqualTo(3.14));
+            Storage.AddNumeric("x", 3);
+            Assert.That(Storage.GetNumeric("x"), Is.EqualTo(3));
         }
 
         [Test]
@@ -393,7 +393,7 @@ namespace EchoBasic.Tests
         [Test]
         public void HasNumericExistingVariableReturnsTrue()
         {
-            Storage.AddNumeric("x", 1.0);
+            Storage.AddNumeric("x", 1);
             Assert.That(Storage.HasNumeric("x"), Is.True);
         }
 

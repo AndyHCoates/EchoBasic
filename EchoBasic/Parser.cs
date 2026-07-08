@@ -24,7 +24,7 @@ namespace EchoBasic
                 if (char.IsDigit(currentChar) || isUnaryMinus)
                 {
                     var parseLength = 1;
-                    while (parseStart + parseLength < input.Length && (char.IsDigit(input[parseStart + parseLength]) || input[parseStart + parseLength] == '.'))
+                    while (parseStart + parseLength < input.Length && char.IsDigit(input[parseStart + parseLength]))
                     {
                         parseLength++;
                     }
@@ -36,7 +36,7 @@ namespace EchoBasic
                         break;
                     }
 
-                    tokens.Add(new NumberToken(double.Parse(numberString)));
+                    tokens.Add(new NumberToken(int.Parse(numberString)));
                     parseStart += parseLength;
                 }
                 else if (char.IsLetter(currentChar) || currentChar == '$')

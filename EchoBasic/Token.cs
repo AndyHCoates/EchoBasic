@@ -32,9 +32,9 @@ namespace EchoBasic
         }
     }
 
-    public sealed class NumberToken(double value) : Token(TokenType.Number)
+    public sealed class NumberToken(int value) : Token(TokenType.Number)
     {
-        public double Value { get; } = value;
+        public int Value { get; } = value;
 
         public override string ToString()
         {
